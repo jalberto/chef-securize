@@ -6,11 +6,11 @@ packages.each do |pkg|
   end
 end
 
-if node['securirze']['ufw']['ips_whitelist']
-  node['securirze']['ufw']['ips_whitelist'].each do |ip|
+if node.securize.ufw.ips_whitelist
+  node.securize.ufw.ips_whitelist.each do |ip|
     bash "Add safe IPs hosts.allow" do
       code <<-EOF
-    echo "sshd: #{ip} >> /etc/hosts.allow"
+      echo "sshd: #{ip} >> /etc/hosts.allow"
       EOF
     end
   end
