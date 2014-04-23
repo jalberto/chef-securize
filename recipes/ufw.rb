@@ -13,7 +13,7 @@ if node['securize']['ufw']['ports_whitelist']
 end
 
 if node['securize']['ufw']['ips_whitelist']
-  node["securize"]["ufw"]["ips_whitelist"].each do |port|
+  node["securize"]["ufw"]["ips_whitelist"].each do |ip|
     execute "UFW allow IP #{ip}" do
       command "ufw allow from #{ip}"
       action :run
