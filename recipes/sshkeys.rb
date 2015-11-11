@@ -11,28 +11,27 @@ unless gh_users.empty?
 
     ruby_block "add_key" do
       block do
-        last_key = IO.readlines(keys_file)[-1..-1].first
-        if last_key
+        IO.readlines(keys_file).each do |line|
           file = Chef::Util::FileEdit.new(authorized_keys_file)
-          file.insert_line_if_no_match(/#{last_key}/, last_key)
+          file.insert_line_if_no_match(/#{line}/, line)
           file.write_file
         end
       end
       notifies :run, "ruby_block[remove_duplicates]", :immediately
       only_if { File.exists?(authorized_keys_file) }
     end
-
-    ruby_block "remove_duplicates" do
-      block do
-        # TODO: must be a better way
-        uniq_keys = File.readlines(authorized_keys_file).uniq
-        FileUtils.cp(authorized_keys_file, authorized_keys_file + ".bak")
-        File.open(authorized_keys_file, "w+") { |f| f.puts uniq_keys  }
-      end
-      action :nothing # This run only if add_key is succeful
-    end
   end
 
+  ruby_block "remove_duplicates" do
+    block do
+      # TODO: must be a better way
+      uniq_keys = File.readlines(authorized_keys_file).uniq
+      FileUtils.cp(authorized_keys_file, authorized_keys_file + ".bak")
+      File.open(authorized_keys_file, "w+") { |f| f.puts uniq_keys  }
+    end
+    action :nothing # This run only if add_key is succeful
+  end
+  
 else
   log "gh_users empty" do
     level :warn
